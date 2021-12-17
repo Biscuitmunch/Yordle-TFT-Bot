@@ -16,7 +16,19 @@ janna_image = cv2.imread('charCards\\janna.png', cv2.IMREAD_UNCHANGED)
 common_orb_image = cv2.imread('orbPickups\\commonOrb.png', cv2.IMREAD_UNCHANGED)
 rare_orb_image = cv2.imread('orbPickups\\rareOrb.png', cv2.IMREAD_UNCHANGED)
 legendary_orb_image = cv2.imread('orbPickups\\legendaryOrb.png', cv2.IMREAD_UNCHANGED)
+stage_one_image = cv2.imread('stageNumbers\\stageOne.png', cv2.IMREAD_UNCHANGED)
+dash_one_image = cv2.imread('stageNumbers\\dashOne.png', cv2.IMREAD_UNCHANGED)
+dash_seven_image = cv2.imread('stageNumbers\\dashOne.png', cv2.IMREAD_UNCHANGED)
 
+# Screenshotter
+sct = mss.mss()
+
+bottomval = 0.9
+
+type = 'null'
+
+gold = 0
+level = 1
 
 # Shop Area
 shop_dimensions = {
@@ -47,52 +59,14 @@ gold_dimensions = {
         'height': 30
     }
 
-# Screenshotter
-sct = mss.mss()
+stage_dimensions = {
+        'left': 740,
+        'top': 1,
+        'width': 440,
+        'height': 34
+    }
 
-bottomval = 0.9
-
-gold = 0
-level = 1
-
-# Game Loop
-while True:
-
-    sleep(0.1)
-
-    # YORDLE PURCHASING
-
-    shopScr = np.array(sct.grab(shop_dimensions))
-
-    matchedYordleCards = cv2.matchTemplate(shopScr, yordle_card_image, cv2.TM_CCOEFF_NORMED)
-
-    yloc, xloc = np.where(matchedYordleCards >= bottomval)
-
-    yordleCards = []
-
-    for (x, y) in zip(xloc, yloc):
-        yordleCards.append([int(x), int(y), int(yordle_card_image.shape[1]), int(yordle_card_image.shape[0])])
-
-    if level >= 7:
-        matchedJannaCard = cv2.matchTemplate(shopScr, janna_image, cv2.TM_CCOEFF_NORMED)
-        yloc, xloc = np.where(matchedJannaCard >= bottomval)
-
-        for (x, y) in zip(xloc, yloc):
-            yordleCards.append([int(x), int(y), int(janna_image.shape[1]), int(janna_image.shape[0])])
-
-
-    for (x, y, w, h) in yordleCards:
-        pyautogui.moveTo(x=x+472+(w/2), y=y+924+(h/2), duration=0.2)
-        pyautogui.mouseDown()
-        sleep(0.05)
-        pyautogui.mouseUp()
-        
-
-    if keyboard.is_pressed('p'):
-        break
-
-
-    # ORB PICKUPS
+def orbPickups():
 
     boardScr = np.array(sct.grab(monitor_dimensions))
 
@@ -131,6 +105,67 @@ while True:
         pyautogui.mouseUp(button='right')
         sleep(1.5)
 
+
+def purchaseUnits():
+
+    shopScr = np.array(sct.grab(shop_dimensions))
+
+    matchedYordleCards = cv2.matchTemplate(shopScr, yordle_card_image, cv2.TM_CCOEFF_NORMED)
+
+    yloc, xloc = np.where(matchedYordleCards >= bottomval)
+
+    yordleCards = []
+
+    for (x, y) in zip(xloc, yloc):
+        yordleCards.append([int(x), int(y), int(yordle_card_image.shape[1]), int(yordle_card_image.shape[0])])
+
+    if level >= 7:
+        matchedJannaCard = cv2.matchTemplate(shopScr, janna_image, cv2.TM_CCOEFF_NORMED)
+        yloc, xloc = np.where(matchedJannaCard >= bottomval)
+
+        for (x, y) in zip(xloc, yloc):
+            yordleCards.append([int(x), int(y), int(janna_image.shape[1]), int(janna_image.shape[0])])
+
+
+    for (x, y, w, h) in yordleCards:
+        pyautogui.moveTo(x=x+472+(w/2), y=y+924+(h/2), duration=0.2)
+        pyautogui.mouseDown()
+        sleep(0.05)
+        pyautogui.mouseUp()
+
+
+# Game Loop
+while True:
+
+    sleep(0.1)
+
+    # DECIDING STAGES
+    stageScr = np.array(sct.grab(stage_dimensions))
+
+    # PvE Stage. Checking for Stage '1 - x', 'x - 1', or 'x - 7'
+    matchedPveStageOne = cv2.matchTemplate(stageScr, stage_one_image, cv2.TM_CCOEFF_NORMED)
+    minMatchStageOne, maxMatchStageOne, minLocationStageOne, maxLocationStageOne = cv2.minMaxLoc(matchedPveStageOne)
+
+    matchedPveDashOne = cv2.matchTemplate(stageScr, dash_one_image, cv2.TM_CCOEFF_NORMED)
+    minMatchDashOne, maxMatchDashOne, minLocationDashOne, maxLocationDashOne = cv2.minMaxLoc(matchedPveDashOne)
+
+    matchedPveDashSeven = cv2.matchTemplate(stageScr, dash_seven_image, cv2.TM_CCOEFF_NORMED)
+    minMatchDashSeven, maxMatchDashSeven, minLocationDashSeven, maxLocationDashSeven = cv2.minMaxLoc(matchedPveDashSeven)
+
+    if (maxMatchStageOne > bottomval or maxMatchDashOne > bottomval or maxMatchDashSeven > bottomval):
+        type = 'pve'
+    else:
+        type = 'standard'
+
+    # YORDLE PURCHASING
+
+    purchaseUnits()
+
+    if keyboard.is_pressed('p'):
+        break
+
+    if (type == 'pve'):
+        orbPickups()
 
     # LEVEL & GOLD INFORMATION
 
