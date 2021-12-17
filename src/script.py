@@ -175,7 +175,7 @@ while True:
         pyautogui.mouseUp()
 
     # Alternate above 6
-    if (gold >= 56 and level >= 6):
+    if (gold >= 56 and level > 6):
         pyautogui.moveTo(x=360, y=960, duration=0.2)
         pyautogui.mouseDown()
         sleep(0.1)
