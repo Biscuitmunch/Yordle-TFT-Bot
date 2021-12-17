@@ -38,8 +38,11 @@ while True:
         yordleCards.append([int(x), int(y), int(yordle_card_image.shape[1]), int(yordle_card_image.shape[0])])
 
     for (x, y, w, h) in yordleCards:
-        sleep(1)
-        pyautogui.click(x=x+472, y=y+924)
+        pyautogui.moveTo(x=x+472, y=y+924, duration=1)
+        pyautogui.mouseDown()
+        sleep(0.1)
+        pyautogui.mouseUp()
+        
 
     if keyboard.is_pressed('p'):
         break
