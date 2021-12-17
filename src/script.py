@@ -161,19 +161,19 @@ while True:
     print(gold)
 
     # Level if below 6
-    if gold >= 54 & level < 6:
+    if (gold >= 54 and level < 6):
         pyautogui.keyDown('f')
         sleep(0.1)
         pyautogui.keyUp('f')
     
     # Roll if 6
-    if gold >= 52 & level == 6:
+    if (gold >= 52 and level == 6):
         pyautogui.keyDown('d')
         sleep(0.1)
         pyautogui.keyUp('d')
 
     # Alternate above 6
-    if gold >= 56 & level >= 6:
+    if (gold >= 56 and level >= 6):
         pyautogui.keyDown('f')
         sleep(0.1)
         pyautogui.keyUp('f')
