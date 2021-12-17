@@ -18,7 +18,7 @@ rare_orb_image = cv2.imread('orbPickups\\rareOrb.png', cv2.IMREAD_UNCHANGED)
 legendary_orb_image = cv2.imread('orbPickups\\legendaryOrb.png', cv2.IMREAD_UNCHANGED)
 stage_one_image = cv2.imread('stageNumbers\\stageOne.png', cv2.IMREAD_UNCHANGED)
 dash_one_image = cv2.imread('stageNumbers\\dashOne.png', cv2.IMREAD_UNCHANGED)
-dash_seven_image = cv2.imread('stageNumbers\\dashOne.png', cv2.IMREAD_UNCHANGED)
+dash_seven_image = cv2.imread('stageNumbers\\dashSeven.png', cv2.IMREAD_UNCHANGED)
 
 # Screenshotter
 sct = mss.mss()
@@ -194,6 +194,7 @@ while True:
 
     print(level)
     print(gold)
+    print(type)
 
     # Level if below 6
     if (gold >= 54 and level < 6):
