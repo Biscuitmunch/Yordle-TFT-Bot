@@ -10,3 +10,4 @@ Libraries Needed
 - keyboard
 - mss
 - pyautogui
+- pytesseract
