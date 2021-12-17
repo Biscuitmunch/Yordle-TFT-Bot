@@ -162,22 +162,26 @@ while True:
 
     # Level if below 6
     if (gold >= 54 and level < 6):
-        pyautogui.keyDown('f')
+        pyautogui.moveTo(x=360, y=960, duration=0.2)
+        pyautogui.mouseDown()
         sleep(0.1)
-        pyautogui.keyUp('f')
+        pyautogui.mouseUp()
     
     # Roll if 6
     if (gold >= 52 and level == 6):
-        pyautogui.keyDown('d')
+        pyautogui.moveTo(x=360, y=1040, duration=0.2)
+        pyautogui.mouseDown()
         sleep(0.1)
-        pyautogui.keyUp('d')
+        pyautogui.mouseUp()
 
     # Alternate above 6
     if (gold >= 56 and level >= 6):
-        pyautogui.keyDown('f')
+        pyautogui.moveTo(x=360, y=960, duration=0.2)
+        pyautogui.mouseDown()
         sleep(0.1)
-        pyautogui.keyUp('f')
+        pyautogui.mouseUp()
         sleep(0.1)
-        pyautogui.keyDown('d')
+        pyautogui.moveTo(x=360, y=1040, duration=0.2)
+        pyautogui.mouseDown()
         sleep(0.1)
-        pyautogui.keyUp('d')
+        pyautogui.mouseUp()
