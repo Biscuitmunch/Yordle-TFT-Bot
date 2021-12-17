@@ -82,7 +82,7 @@ while True:
 
 
     for (x, y, w, h) in yordleCards:
-        pyautogui.moveTo(x=x+472+(w/2), y=y+924+(h/2), duration=0.05)
+        pyautogui.moveTo(x=x+472+(w/2), y=y+924+(h/2), duration=0.1)
         pyautogui.mouseDown()
         sleep(0.05)
         pyautogui.mouseUp()
@@ -162,28 +162,28 @@ while True:
 
     # Level if below 6
     if (gold >= 54 and level < 6):
-        pyautogui.moveTo(x=360, y=960, duration=0.05)
+        pyautogui.moveTo(x=360, y=960, duration=0.1)
         pyautogui.mouseDown()
         sleep(0.05)
         pyautogui.mouseUp()
     
     # Roll if 6
     if (gold >= 52 and level == 6):
-        pyautogui.moveTo(x=360, y=1040, duration=0.05)
+        pyautogui.moveTo(x=360, y=1040, duration=0.1)
         pyautogui.mouseDown()
         sleep(0.05)
         pyautogui.mouseUp()
 
     # Alternate above 6
     if (gold >= 70 and level == 7):
-        pyautogui.moveTo(x=360, y=960, duration=0.05)
+        pyautogui.moveTo(x=360, y=960, duration=0.1)
         while (gold > 3):
             pyautogui.mouseDown()
             sleep(0.05)
             pyautogui.mouseUp()
 
     if (gold >= 12 and level >= 8):
-        pyautogui.moveTo(x=360, y=1040, duration=0.05)
+        pyautogui.moveTo(x=360, y=1040, duration=0.1)
         pyautogui.mouseDown()
         sleep(0.05)
         pyautogui.mouseUp()
