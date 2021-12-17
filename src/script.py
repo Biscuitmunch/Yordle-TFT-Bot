@@ -58,6 +58,8 @@ level = 1
 # Game Loop
 while True:
 
+    sleep(0.1)
+
     # YORDLE PURCHASING
 
     shopScr = np.array(sct.grab(shop_dimensions))
@@ -102,21 +104,21 @@ while True:
     orbLocations = []
 
     # Adding Common Orbs
-    yloc, xloc = np.where(matchedCommonOrbs >= 0.75)
+    yloc, xloc = np.where(matchedCommonOrbs >= 0.72)
 
     for (x, y) in zip(xloc, yloc):
         orbLocations.append([int(x), int(y), int(common_orb_image.shape[1]), int(common_orb_image.shape[0])])
         break
     
     # Adding Rare Orbs
-    yloc, xloc = np.where(matchedRareOrbs >= 0.75)
+    yloc, xloc = np.where(matchedRareOrbs >= 0.72)
 
     for (x, y) in zip(xloc, yloc):
         orbLocations.append([int(x), int(y), int(rare_orb_image.shape[1]), int(rare_orb_image.shape[0])])
         break
 
     # Adding Legendary Orbs
-    yloc, xloc = np.where(matchedLegendaryOrbs >= 0.75)
+    yloc, xloc = np.where(matchedLegendaryOrbs >= 0.72)
     
     for (x, y) in zip(xloc, yloc):
         orbLocations.append([int(x), int(y), int(legendary_orb_image.shape[1]), int(legendary_orb_image.shape[0])])
@@ -175,10 +177,20 @@ while True:
     # Alternate above 6
     if (gold >= 70 and level == 7):
         pyautogui.moveTo(x=360, y=960, duration=0.2)
-        while (gold > 3):
+        while (level < 8):
             pyautogui.mouseDown()
             sleep(0.05)
             pyautogui.mouseUp()
+
+            # Reading the level and saving it
+            levelScr = np.array(sct.grab(level_dimensions))
+            levelScr = np.flip(levelScr[:, :, :3], 2)
+            try:
+                levelText = pytesseract.image_to_string(levelScr)
+                lvlNumFind = re.findall('[0-9]+', levelText)
+                level = int(lvlNumFind[0])
+            except:
+                print("Not tabbed onto league!")
 
     if (gold >= 12 and level >= 8):
         pyautogui.moveTo(x=360, y=1040, duration=0.2)
