@@ -324,6 +324,12 @@ def stageOneThree():
     pyautogui.mouseUp()
 
 # Game Loop
+def level_up():
+    pyautogui.moveTo(x=360, y=960, duration=0.2)
+    pyautogui.mouseDown()
+    sleep(0.05)
+    pyautogui.mouseUp()
+
 while True:
 
     sleep(0.1)
@@ -350,20 +356,14 @@ while True:
     print(type)
 
     if singleExpBuy == 0 and gold > 14:
-        pyautogui.moveTo(x=360, y=960, duration=0.2)
-        pyautogui.mouseDown()
-        sleep(0.05)
-        pyautogui.mouseUp()
+        level_up()
 
         singleExpBuy = singleExpBuy + 1
 
 
     # Level if below 6
     while (gold >= 54 and level < 6):
-        pyautogui.moveTo(x=360, y=960, duration=0.2)
-        pyautogui.mouseDown()
-        sleep(0.05)
-        pyautogui.mouseUp()
+        level_up()
 
         purchaseUnits()
 
@@ -387,11 +387,8 @@ while True:
 
     # Skip to 8 (Janna and Veigar)
     if (gold >= 70 and level == 7):
-        pyautogui.moveTo(x=360, y=960, duration=0.2)
         while (level < 8):
-            pyautogui.mouseDown()
-            sleep(0.05)
-            pyautogui.mouseUp()
+            level_up()
 
             level = levelRead()
 
