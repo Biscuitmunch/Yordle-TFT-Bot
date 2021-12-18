@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 import cv2
 import numpy as np
 import keyboard
@@ -238,9 +239,6 @@ while True:
     # YORDLE PURCHASING FROM NATURAL ROLL
     purchaseUnits()
 
-    if (type == 'pve' or type == 'postpve'):
-        orbPickups()
-
     # LEVEL & GOLD INFORMATION
 
     gold = goldRead()
@@ -296,3 +294,7 @@ while True:
 
         gold = goldRead()
         level = levelRead()
+
+    while stageNumber == getStageNumber():
+        if (type == 'pve' or type == 'postpve'):
+            orbPickups()
