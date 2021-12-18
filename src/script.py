@@ -144,6 +144,7 @@ def orbPickups():
 
 def purchaseUnits():
 
+    global yordlesBought
     sleep(0.4)
     shopScr = np.array(sct.grab(shop_dimensions))
 
@@ -366,9 +367,7 @@ while True:
         sleep(0.05)
         pyautogui.mouseUp()
 
-        sleep(0.1)
         purchaseUnits()
-        sleep(0.1)
 
         gold = goldRead()
         level = levelRead()
