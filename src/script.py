@@ -1,4 +1,5 @@
 from contextlib import nullcontext
+from enum import Enum
 import cv2
 import numpy as np
 import keyboard
@@ -42,7 +43,18 @@ tristana_ult_image = cv2.imread('ultIcons\\tristanaUlt.png', cv2.IMREAD_UNCHANGE
 heimer_ult_image = cv2.imread('ultIcons\\heimerUlt.png', cv2.IMREAD_UNCHANGED)
 vex_ult_image = cv2.imread('ultIcons\\vexUlt.png', cv2.IMREAD_UNCHANGED)
 
-# 0 = Nothing, 1 = Something, 2 = Poppy, 3 = Ziggs, 4 = Lulu, 5 = Tristana, 6 = Heimerdinger, 7 = Vex, 8 = Janna, 9 = Veigar
+class Champions(Enum) :
+    Nothing=0
+    Something=1
+    Poppy=2
+    Ziggs=3
+    Lulu=4
+    Tristana=5
+    Heimerdinger=6
+    Vex=7
+    Janna=8
+    Veigar=9
+
 # Hex Positions
 hex_positions = [[561, 444, 0], [679, 444, 0], [787, 444, 0], [900, 444, 0], [1020, 444, 0], [1136, 444, 0], [1250, 444, 0],
                  [607, 515, 0], [730, 515, 0], [846, 515, 0], [963, 515, 0], [1081, 515, 0], [1200, 515, 0], [1320, 515, 0],
@@ -313,6 +325,12 @@ def stageOneThree():
     pyautogui.mouseUp()
 
 # Game Loop
+def level_up():
+    pyautogui.moveTo(x=360, y=960, duration=0.2)
+    pyautogui.mouseDown()
+    sleep(0.05)
+    pyautogui.mouseUp()
+
 while True:
 
     sleep(0.1)
@@ -339,20 +357,14 @@ while True:
     print(type)
 
     if singleExpBuy == 0 and gold > 14:
-        pyautogui.moveTo(x=360, y=960, duration=0.2)
-        pyautogui.mouseDown()
-        sleep(0.05)
-        pyautogui.mouseUp()
+        level_up()
 
         singleExpBuy = singleExpBuy + 1
 
 
     # Level if below 6
     while (gold >= 54 and level < 6):
-        pyautogui.moveTo(x=360, y=960, duration=0.2)
-        pyautogui.mouseDown()
-        sleep(0.05)
-        pyautogui.mouseUp()
+        level_up()
 
         purchaseUnits()
 
@@ -374,11 +386,8 @@ while True:
 
     # Skip to 8 (Janna and Veigar)
     if (gold >= 70 and level == 7):
-        pyautogui.moveTo(x=360, y=960, duration=0.2)
         while (level < 8):
-            pyautogui.mouseDown()
-            sleep(0.05)
-            pyautogui.mouseUp()
+            level_up()
 
             level = levelRead()
 
