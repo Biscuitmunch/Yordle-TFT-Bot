@@ -58,6 +58,8 @@ bottomval = 0.9
 
 yordlesBought = 0
 
+singleExpBuy = 0
+
 type = 'null'
 
 gold = 0
@@ -334,6 +336,13 @@ while True:
     print(level)
     print(gold)
     print(type)
+
+    if singleExpBuy == 0 and gold > 14:
+        pyautogui.moveTo(x=360, y=960, duration=0.2)
+        pyautogui.mouseDown()
+        sleep(0.05)
+        pyautogui.mouseUp()
+
 
     # Level if below 6
     while (gold >= 54 and level < 6):
