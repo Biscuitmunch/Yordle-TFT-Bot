@@ -16,8 +16,21 @@ janna_image = cv2.imread('charCards\\janna.png', cv2.IMREAD_UNCHANGED)
 common_orb_image = cv2.imread('orbPickups\\commonOrb.png', cv2.IMREAD_UNCHANGED)
 rare_orb_image = cv2.imread('orbPickups\\rareOrb.png', cv2.IMREAD_UNCHANGED)
 legendary_orb_image = cv2.imread('orbPickups\\legendaryOrb.png', cv2.IMREAD_UNCHANGED)
+
+# Importing Stage Images
 stage_one_image = cv2.imread('stageNumbers\\stageOne.png', cv2.IMREAD_UNCHANGED)
+stage_two_image = cv2.imread('stageNumbers\\stageTwo.png', cv2.IMREAD_UNCHANGED)
+stage_three_image = cv2.imread('stageNumbers\\stageThree.png', cv2.IMREAD_UNCHANGED)
+stage_four_image = cv2.imread('stageNumbers\\stageFour.png', cv2.IMREAD_UNCHANGED)
+stage_five_image = cv2.imread('stageNumbers\\stageFive.png', cv2.IMREAD_UNCHANGED)
+stage_six_image = cv2.imread('stageNumbers\\stageSix.png', cv2.IMREAD_UNCHANGED)
+
 dash_one_image = cv2.imread('stageNumbers\\dashOne.png', cv2.IMREAD_UNCHANGED)
+dash_two_image = cv2.imread('stageNumbers\\dashTwo.png', cv2.IMREAD_UNCHANGED)
+dash_three_image = cv2.imread('stageNumbers\\dashThree.png', cv2.IMREAD_UNCHANGED)
+dash_four_image = cv2.imread('stageNumbers\\dashFour.png', cv2.IMREAD_UNCHANGED)
+dash_five_image = cv2.imread('stageNumbers\\dashFive.png', cv2.IMREAD_UNCHANGED)
+dash_six_image = cv2.imread('stageNumbers\\dashSix.png', cv2.IMREAD_UNCHANGED)
 dash_seven_image = cv2.imread('stageNumbers\\dashSeven.png', cv2.IMREAD_UNCHANGED)
 
 # Screenshotter
@@ -133,56 +146,55 @@ def purchaseUnits():
         sleep(0.05)
         pyautogui.mouseUp()
 
+def getStageNumber():
 
-# Game Loop
-while True:
-
-    sleep(0.1)
-
-    # DECIDING STAGES
     stageScr = np.array(sct.grab(stage_dimensions))
 
+    StageOne = cv2.matchTemplate(stageScr, stage_one_image, cv2.TM_CCOEFF_NORMED).max()
+    StageTwo = cv2.matchTemplate(stageScr, stage_two_image, cv2.TM_CCOEFF_NORMED).max()
+    StageThree = cv2.matchTemplate(stageScr, stage_three_image, cv2.TM_CCOEFF_NORMED).max()
+    StageFour = cv2.matchTemplate(stageScr, stage_four_image, cv2.TM_CCOEFF_NORMED).max()
+    StageFive = cv2.matchTemplate(stageScr, stage_five_image, cv2.TM_CCOEFF_NORMED).max()
+    StageSix = cv2.matchTemplate(stageScr, stage_six_image, cv2.TM_CCOEFF_NORMED).max()
+
+    stageVals = [StageOne, StageTwo, StageThree, StageFour, StageFive, StageSix]
+    maxStageMatch = max(stageVals)
+    stageValue = stageVals.index(maxStageMatch) + 1
+
+
+    DashOne = cv2.matchTemplate(stageScr, dash_one_image, cv2.TM_CCOEFF_NORMED).max()
+    DashTwo = cv2.matchTemplate(stageScr, dash_two_image, cv2.TM_CCOEFF_NORMED).max()
+    DashThree = cv2.matchTemplate(stageScr, dash_three_image, cv2.TM_CCOEFF_NORMED).max()
+    DashFour = cv2.matchTemplate(stageScr, dash_four_image, cv2.TM_CCOEFF_NORMED).max()
+    DashFive = cv2.matchTemplate(stageScr, dash_five_image, cv2.TM_CCOEFF_NORMED).max()
+    DashSix = cv2.matchTemplate(stageScr, dash_six_image, cv2.TM_CCOEFF_NORMED).max()
+    DashSeven = cv2.matchTemplate(stageScr, dash_seven_image, cv2.TM_CCOEFF_NORMED).max()
+
+    dashNums = [DashOne, DashTwo, DashThree, DashFour, DashFive, DashSix, DashSeven]
+    maxDashMatch = max(dashNums)
+    dashValue = dashNums.index(maxDashMatch) + 1
+
+
+    return stageValue * 10 + dashValue
+
+def roundType():
     # PvE Stage. Checking for Stage '1 - x', 'x - 1', or 'x - 7'
-    matchedPveStageOne = cv2.matchTemplate(stageScr, stage_one_image, cv2.TM_CCOEFF_NORMED)
-    minMatchStageOne, maxMatchStageOne, minLocationStageOne, maxLocationStageOne = cv2.minMaxLoc(matchedPveStageOne)
 
-    matchedPveDashOne = cv2.matchTemplate(stageScr, dash_one_image, cv2.TM_CCOEFF_NORMED)
-    minMatchDashOne, maxMatchDashOne, minLocationDashOne, maxLocationDashOne = cv2.minMaxLoc(matchedPveDashOne)
-
-    matchedPveDashSeven = cv2.matchTemplate(stageScr, dash_seven_image, cv2.TM_CCOEFF_NORMED)
-    minMatchDashSeven, maxMatchDashSeven, minLocationDashSeven, maxLocationDashSeven = cv2.minMaxLoc(matchedPveDashSeven)
-
-    if (maxMatchStageOne > bottomval or maxMatchDashOne > bottomval or maxMatchDashSeven > bottomval):
+    if stageNumber == 11 or (stageNumber - 4) % 10 == 0:
+        type = 'carousel'
+    elif stageNumber < 20 or (stageNumber - 7) % 10 == 0:
         type = 'pve'
+    elif (stageNumber - 1) % 10 == 0:
+        type = 'postpve'
     else:
         type = 'standard'
 
-    # YORDLE PURCHASING
+    return type
 
-    purchaseUnits()
-
-    if keyboard.is_pressed('p'):
-        break
-
-    if (type == 'pve'):
-        orbPickups()
-
-    # LEVEL & GOLD INFORMATION
-
-    # Changing to RGB
-    levelScr = np.array(sct.grab(level_dimensions))
-    levelScr = np.flip(levelScr[:, :, :3], 2)
+def goldRead():
 
     goldScr = np.array(sct.grab(gold_dimensions))
     goldScr = np.flip(goldScr[:, :, :3], 2)
-
-    # Reading the level and saving it
-    try:
-        levelText = pytesseract.image_to_string(levelScr)
-        lvlNumFind = re.findall('[0-9]+', levelText)
-        level = int(lvlNumFind[0])
-    except:
-        print("Not tabbed onto league!")
 
     # Reading the gold and saving it
     try:
@@ -192,25 +204,78 @@ while True:
     except:
         print("Not tabbed onto league!")
 
+    return gold
+
+def levelRead():
+
+    # Changing to RGB
+    levelScr = np.array(sct.grab(level_dimensions))
+    levelScr = np.flip(levelScr[:, :, :3], 2)
+
+    # Reading the level and saving it
+    try:
+        levelText = pytesseract.image_to_string(levelScr)
+        lvlNumFind = re.findall('[0-9]+', levelText)
+        level = int(lvlNumFind[0])
+    except:
+        print("Not tabbed onto league!")
+
+    return level
+
+# Game Loop
+while True:
+
+    sleep(0.1)
+
+    # Format stage in 10's, dash in 1's eg 2-3 is 23
+    stageNumber = getStageNumber()
+
+    # Checking if standard, PvE, or carousel
+    type = roundType()
+    
+    print(stageNumber)
+
+    # YORDLE PURCHASING FROM NATURAL ROLL
+    purchaseUnits()
+
+    if (type == 'pve' or type == 'postpve'):
+        orbPickups()
+
+    # LEVEL & GOLD INFORMATION
+
+    gold = goldRead()
+
+    level = levelRead()
+
     print(level)
     print(gold)
     print(type)
 
     # Level if below 6
-    if (gold >= 54 and level < 6):
+    while (gold >= 54 and level < 6):
         pyautogui.moveTo(x=360, y=960, duration=0.2)
         pyautogui.mouseDown()
         sleep(0.05)
         pyautogui.mouseUp()
+
+        purchaseUnits()
+
+        gold = goldRead()
+        level = levelRead()
     
     # Roll if 6
-    if (gold >= 52 and level == 6):
+    while (gold >= 52 and level == 6):
         pyautogui.moveTo(x=360, y=1040, duration=0.2)
         pyautogui.mouseDown()
         sleep(0.05)
         pyautogui.mouseUp()
 
-    # Alternate above 6
+        purchaseUnits()
+
+        gold = goldRead()
+        level = levelRead()
+
+    # Skip to 8 (Janna and Veigar)
     if (gold >= 70 and level == 7):
         pyautogui.moveTo(x=360, y=960, duration=0.2)
         while (level < 8):
@@ -218,18 +283,16 @@ while True:
             sleep(0.05)
             pyautogui.mouseUp()
 
-            # Reading the level and saving it
-            levelScr = np.array(sct.grab(level_dimensions))
-            levelScr = np.flip(levelScr[:, :, :3], 2)
-            try:
-                levelText = pytesseract.image_to_string(levelScr)
-                lvlNumFind = re.findall('[0-9]+', levelText)
-                level = int(lvlNumFind[0])
-            except:
-                print("Not tabbed onto league!")
+            level = levelRead()
 
-    if (gold >= 12 and level >= 8):
+
+    while (gold >= 12 and level >= 8):
         pyautogui.moveTo(x=360, y=1040, duration=0.2)
         pyautogui.mouseDown()
         sleep(0.05)
         pyautogui.mouseUp()
+
+        purchaseUnits()
+
+        gold = goldRead()
+        level = levelRead()
