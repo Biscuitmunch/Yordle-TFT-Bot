@@ -34,6 +34,14 @@ dash_five_image = cv2.imread('stageNumbers\\dashFive.png', cv2.IMREAD_UNCHANGED)
 dash_six_image = cv2.imread('stageNumbers\\dashSix.png', cv2.IMREAD_UNCHANGED)
 dash_seven_image = cv2.imread('stageNumbers\\dashSeven.png', cv2.IMREAD_UNCHANGED)
 
+# Importing Yordle Ult Images
+poppy_ult_image = cv2.imread('ultIcons\\poppyUlt.png', cv2.IMREAD_UNCHANGED)
+ziggs_ult_image = cv2.imread('ultIcons\\ziggsUlt.png', cv2.IMREAD_UNCHANGED)
+lulu_ult_image = cv2.imread('ultIcons\\luluUlt.png', cv2.IMREAD_UNCHANGED)
+tristana_ult_image = cv2.imread('ultIcons\\tristanaUlt.png', cv2.IMREAD_UNCHANGED)
+heimer_ult_image = cv2.imread('ultIcons\\heimerUlt.png', cv2.IMREAD_UNCHANGED)
+vex_ult_image = cv2.imread('ultIcons\\vexUlt.png', cv2.IMREAD_UNCHANGED)
+
 # 0 = Nothing, 1 = Something, 2 = Poppy, 3 = Ziggs, 4 = Lulu, 5 = Tristana, 6 = Heimerdinger, 7 = Vex, 8 = Janna, 9 = Veigar
 # Hex Positions
 hex_positions = [[561, 444, 0], [679, 444, 0], [787, 444, 0], [900, 444, 0], [1020, 444, 0], [1136, 444, 0], [1250, 444, 0],
@@ -47,6 +55,8 @@ bench_positions = [[457, 787, 0], [575, 787, 0], [683, 787, 0], [802, 787, 0], [
 sct = mss.mss()
 
 bottomval = 0.9
+
+yordlesBought = 0
 
 type = 'null'
 
@@ -142,6 +152,7 @@ def purchaseUnits():
     yordleCards = []
 
     for (x, y) in zip(xloc, yloc):
+        yordlesBought = yordlesBought + 1
         yordleCards.append([int(x), int(y), int(yordle_card_image.shape[1]), int(yordle_card_image.shape[0])])
 
     if level >= 7:
@@ -243,7 +254,56 @@ def levelRead():
 
     return levelCurrent
 
+def checkYordle(yor):
+
+    # 0 = Nothing, 1 = Something, 2 = Poppy, 3 = Ziggs, 4 = Lulu, 5 = Tristana, 6 = Heimerdinger, 7 = Vex, 8 = Janna, 9 = Veigar
+    # Right clicking to see character
+    pyautogui.moveTo(x=bench_positions[yor][0], y=bench_positions[yor][1], duration=0.2)
+
+    pyautogui.mouseDown(button='right')
+    sleep(0.1)
+    pyautogui.mouseUp(button='right')
+    sleep(0.4)
+
+    # Right Clicked Unit Screenshot
+    unitScr = np.array(sct.grab(monitor_dimensions))
+
+    poppySpot = cv2.matchTemplate(unitScr, poppy_ult_image, cv2.TM_CCOEFF_NORMED).max()
+    ziggsSpot = cv2.matchTemplate(unitScr, ziggs_ult_image, cv2.TM_CCOEFF_NORMED).max()
+    luluSpot = cv2.matchTemplate(unitScr, lulu_ult_image, cv2.TM_CCOEFF_NORMED).max()
+    tristanaSpot = cv2.matchTemplate(unitScr, tristana_ult_image, cv2.TM_CCOEFF_NORMED).max()
+    heimerSpot = cv2.matchTemplate(unitScr, heimer_ult_image, cv2.TM_CCOEFF_NORMED).max()
+    vexSpot = cv2.matchTemplate(unitScr, vex_ult_image, cv2.TM_CCOEFF_NORMED).max()
+    
+    yorVals = [poppySpot, ziggsSpot, luluSpot, tristanaSpot, heimerSpot, vexSpot]
+    maxYordleMatch = max(yorVals)
+    
+    if maxYordleMatch > 0.95:
+        return yorVals.index(maxYordleMatch) + 2
+    else:
+        return 0
+        
+
+
+
+
 def stageOneTwo():
+    # Moving first unit on
+    pyautogui.moveTo(x=bench_positions[0][0], y=bench_positions[0][1], duration=0.2)
+    pyautogui.mouseDown()
+    pyautogui.moveTo(x=hex_positions[2][0], y=hex_positions[2][1], duration=0.2)
+    pyautogui.mouseUp()
+
+    hex_positions[2][2] = checkYordle(2)
+
+def stageOneThree():
+    # Buying a second unit
+    pyautogui.moveTo(x=565, y=1000, duration=0.2)
+    pyautogui.mouseDown()
+    sleep(0.05)
+    pyautogui.mouseUp()
+
+    # Moving on a unit
     pyautogui.moveTo(x=bench_positions[0][0], y=bench_positions[0][1], duration=0.2)
     pyautogui.mouseDown()
     pyautogui.moveTo(x=hex_positions[2][0], y=hex_positions[2][1], duration=0.2)
@@ -326,6 +386,9 @@ while True:
 
     if (stageNumber == 12):
         stageOneTwo()
+
+    if (stageNumber == 13):
+        stageOneThree()
 
 
     while stageNumber == getStageNumber():
