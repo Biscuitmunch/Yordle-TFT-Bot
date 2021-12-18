@@ -34,6 +34,14 @@ dash_five_image = cv2.imread('stageNumbers\\dashFive.png', cv2.IMREAD_UNCHANGED)
 dash_six_image = cv2.imread('stageNumbers\\dashSix.png', cv2.IMREAD_UNCHANGED)
 dash_seven_image = cv2.imread('stageNumbers\\dashSeven.png', cv2.IMREAD_UNCHANGED)
 
+# Hex Positions
+hex_positions = [[561, 444, 0], [679, 444, 0], [787, 444, 0], [900, 444, 0], [1020, 444, 0], [1136, 444, 0], [1250, 444, 0],
+                 [607, 515, 0], [730, 515, 0], [846, 515, 0], [963, 515, 0], [1081, 515, 0], [1200, 515, 0], [1320, 515, 0],
+                 [561, 591, 0], [679, 591, 0], [787, 591, 0], [900, 591, 0], [1020, 591, 0], [1136, 591, 0], [1250, 591, 0],
+                 [607, 670, 0], [730, 670, 0], [846, 670, 0], [963, 670, 0], [1081, 670, 0], [1200, 670, 0], [1320, 670, 0]]
+
+bench_positions = [[457, 787], [575, 787], [683, 787], [802, 787], [920, 787], [1040, 787], [1156, 787], [1270, 787], [1390, 787]]
+
 # Screenshotter
 sct = mss.mss()
 
@@ -82,6 +90,7 @@ stage_dimensions = {
 
 def orbPickups():
 
+    sleep(0.4)
     boardScr = np.array(sct.grab(monitor_dimensions))
 
     # Common Orbs
@@ -122,6 +131,7 @@ def orbPickups():
 
 def purchaseUnits():
 
+    sleep(0.4)
     shopScr = np.array(sct.grab(shop_dimensions))
 
     matchedYordleCards = cv2.matchTemplate(shopScr, yordle_card_image, cv2.TM_CCOEFF_NORMED)
@@ -134,6 +144,7 @@ def purchaseUnits():
         yordleCards.append([int(x), int(y), int(yordle_card_image.shape[1]), int(yordle_card_image.shape[0])])
 
     if level >= 7:
+        
         matchedJannaCard = cv2.matchTemplate(shopScr, janna_image, cv2.TM_CCOEFF_NORMED)
         yloc, xloc = np.where(matchedJannaCard >= bottomval)
 
@@ -147,8 +158,10 @@ def purchaseUnits():
         sleep(0.05)
         pyautogui.mouseUp()
 
+
 def getStageNumber():
 
+    sleep(0.4)
     stageScr = np.array(sct.grab(stage_dimensions))
 
     StageOne = cv2.matchTemplate(stageScr, stage_one_image, cv2.TM_CCOEFF_NORMED).max()
@@ -194,6 +207,7 @@ def roundType():
 
 def goldRead():
 
+    sleep(0.4)
     goldScr = np.array(sct.grab(gold_dimensions))
     goldScr = np.flip(goldScr[:, :, :3], 2)
 
@@ -211,6 +225,7 @@ def goldRead():
 
 def levelRead():
 
+    sleep(0.4)
     # Changing to RGB
     levelScr = np.array(sct.grab(level_dimensions))
     levelScr = np.flip(levelScr[:, :, :3], 2)
@@ -267,12 +282,15 @@ while True:
     
     # Roll if 6
     while (gold >= 52 and level == 6):
+
         pyautogui.moveTo(x=360, y=1040, duration=0.2)
         pyautogui.mouseDown()
         sleep(0.05)
         pyautogui.mouseUp()
 
+        sleep(0.1)
         purchaseUnits()
+        sleep(0.1)
 
         gold = goldRead()
         level = levelRead()
@@ -299,7 +317,10 @@ while True:
         gold = goldRead()
         level = levelRead()
 
+
+
     while stageNumber == getStageNumber():
         if (type == 'pve' or type == 'postpve'):
             orbPickups()
+
         purchaseUnits()
