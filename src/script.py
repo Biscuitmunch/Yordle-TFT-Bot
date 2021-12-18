@@ -34,13 +34,14 @@ dash_five_image = cv2.imread('stageNumbers\\dashFive.png', cv2.IMREAD_UNCHANGED)
 dash_six_image = cv2.imread('stageNumbers\\dashSix.png', cv2.IMREAD_UNCHANGED)
 dash_seven_image = cv2.imread('stageNumbers\\dashSeven.png', cv2.IMREAD_UNCHANGED)
 
+# 0 = Nothing, 1 = Something, 2 = Poppy, 3 = Ziggs, 4 = Lulu, 5 = Tristana, 6 = Heimerdinger, 7 = Vex, 8 = Janna, 9 = Veigar
 # Hex Positions
 hex_positions = [[561, 444, 0], [679, 444, 0], [787, 444, 0], [900, 444, 0], [1020, 444, 0], [1136, 444, 0], [1250, 444, 0],
                  [607, 515, 0], [730, 515, 0], [846, 515, 0], [963, 515, 0], [1081, 515, 0], [1200, 515, 0], [1320, 515, 0],
                  [561, 591, 0], [679, 591, 0], [787, 591, 0], [900, 591, 0], [1020, 591, 0], [1136, 591, 0], [1250, 591, 0],
                  [607, 670, 0], [730, 670, 0], [846, 670, 0], [963, 670, 0], [1081, 670, 0], [1200, 670, 0], [1320, 670, 0]]
 
-bench_positions = [[457, 787], [575, 787], [683, 787], [802, 787], [920, 787], [1040, 787], [1156, 787], [1270, 787], [1390, 787]]
+bench_positions = [[457, 787, 0], [575, 787, 0], [683, 787, 0], [802, 787, 0], [920, 787, 0], [1040, 787, 0], [1156, 787, 0], [1270, 787, 0], [1390, 787, 0]]
 
 # Screenshotter
 sct = mss.mss()
@@ -242,6 +243,12 @@ def levelRead():
 
     return levelCurrent
 
+def stageOneTwo():
+    pyautogui.moveTo(x=bench_positions[0][0], y=bench_positions[0][1], duration=0.2)
+    pyautogui.mouseDown()
+    pyautogui.moveTo(x=hex_positions[2][0], y=hex_positions[2][1], duration=0.2)
+    pyautogui.mouseUp()
+
 # Game Loop
 while True:
 
@@ -317,6 +324,8 @@ while True:
         gold = goldRead()
         level = levelRead()
 
+    if (stageNumber == 12):
+        stageOneTwo()
 
 
     while stageNumber == getStageNumber():
