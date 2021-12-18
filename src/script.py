@@ -197,15 +197,17 @@ def goldRead():
     goldScr = np.array(sct.grab(gold_dimensions))
     goldScr = np.flip(goldScr[:, :, :3], 2)
 
+    goldCurrent = 0
+
     # Reading the gold and saving it
     try:
         goldText = pytesseract.image_to_string(goldScr, config='--psm 8')
         goldNumFind = re.findall('[0-9]+', goldText)
-        gold = int(goldNumFind[0])
+        goldCurrent = int(goldNumFind[0])
     except:
         print("Not tabbed onto league!")
 
-    return gold
+    return goldCurrent
 
 def levelRead():
 
@@ -213,15 +215,17 @@ def levelRead():
     levelScr = np.array(sct.grab(level_dimensions))
     levelScr = np.flip(levelScr[:, :, :3], 2)
 
+    levelCurrent = 1
+
     # Reading the level and saving it
     try:
         levelText = pytesseract.image_to_string(levelScr)
         lvlNumFind = re.findall('[0-9]+', levelText)
-        level = int(lvlNumFind[0])
+        levelCurrent = int(lvlNumFind[0])
     except:
         print("Not tabbed onto league!")
 
-    return level
+    return levelCurrent
 
 # Game Loop
 while True:
@@ -298,3 +302,4 @@ while True:
     while stageNumber == getStageNumber():
         if (type == 'pve' or type == 'postpve'):
             orbPickups()
+        purchaseUnits()
