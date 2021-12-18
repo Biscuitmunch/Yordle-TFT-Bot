@@ -343,6 +343,8 @@ while True:
         sleep(0.05)
         pyautogui.mouseUp()
 
+        singleExpBuy = singleExpBuy + 1
+
 
     # Level if below 6
     while (gold >= 54 and level < 6):
