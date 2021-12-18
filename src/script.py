@@ -1,4 +1,5 @@
 from contextlib import nullcontext
+from enum import Enum
 import cv2
 import numpy as np
 import keyboard
@@ -42,7 +43,18 @@ tristana_ult_image = cv2.imread('ultIcons\\tristanaUlt.png', cv2.IMREAD_UNCHANGE
 heimer_ult_image = cv2.imread('ultIcons\\heimerUlt.png', cv2.IMREAD_UNCHANGED)
 vex_ult_image = cv2.imread('ultIcons\\vexUlt.png', cv2.IMREAD_UNCHANGED)
 
-# 0 = Nothing, 1 = Something, 2 = Poppy, 3 = Ziggs, 4 = Lulu, 5 = Tristana, 6 = Heimerdinger, 7 = Vex, 8 = Janna, 9 = Veigar
+class Champions(Enum) :
+    Nothing=0
+    Something=1
+    Poppy=2
+    Ziggs=3
+    Lulu=4
+    Tristana=5
+    Heimerdinger=6
+    Vex=7
+    Janna=8
+    Veigar=9
+
 # Hex Positions
 hex_positions = [[561, 444, 0], [679, 444, 0], [787, 444, 0], [900, 444, 0], [1020, 444, 0], [1136, 444, 0], [1250, 444, 0],
                  [607, 515, 0], [730, 515, 0], [846, 515, 0], [963, 515, 0], [1081, 515, 0], [1200, 515, 0], [1320, 515, 0],
