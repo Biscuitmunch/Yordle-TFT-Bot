@@ -75,7 +75,7 @@ yordlesBought = 0
 
 singleExpBuy = 0
 
-type = 'null'
+gameMode = 'null'
 
 gold = 0
 level = 1
@@ -158,7 +158,7 @@ def orbPickups():
 
     for (x, y, w, h) in orbLocations:
         pyautogui.moveTo(x=x, y=y, duration=0.2)
-        right_click()
+        rightClick()
         sleep(1.5)
 
 def taunt():
@@ -239,21 +239,24 @@ def getStageNumber():
 
     return stageValue * 10 + dashValue
 
-def roundType():
+def getGameMode():
+
+    if (stageNumber == 14) or (stageNumber == 33) or (stageNumber == 46):
+        if(checkForAugmentCards()):
+            return 'augment'
+
     # PvE Stage. Checking for Stage '1 - x', 'x - 1', or 'x - 7'
 
-    if stageNumber == 11 or (stageNumber - 4) % 10 == 0:
-        type = 'carousel'
+    if stageNumber == 11 or (stageNumber - 4) % 10 == 0: #BUG fix this
+        return 'carousel'
     elif stageNumber < 20 or (stageNumber - 7) % 10 == 0:
-        type = 'pve'
+        return 'pve'
     elif (stageNumber - 1) % 10 == 0:
-        type = 'postpve'
+        return 'postpve'
     else:
-        type = 'standard'
+        return 'standard'
 
-    return type
-
-def goldRead():
+def readGold():
 
     sleep(0.4)
     goldScr = np.array(sct.grab(gold_dimensions))
@@ -271,7 +274,7 @@ def goldRead():
 
     return goldCurrent
 
-def levelRead():
+def readLevel():
 
     sleep(0.4)
     # Changing to RGB
@@ -290,22 +293,25 @@ def levelRead():
 
     return levelCurrent
 
+def checkForAugmentCards():
+    return False
+
 def checkYordle(yor, tileArray):
 
     # 0 = Nothing, 1 = Something, 2 = Poppy, 3 = Ziggs, 4 = Lulu, 5 = Tristana, 6 = Heimerdinger, 7 = Vex, 8 = Janna, 9 = Veigar
     # Right clicking to see character
     pyautogui.moveTo(x=tileArray[yor][0], y=tileArray[yor][1], duration=0.2)
 
-    right_click()
+    rightClick()
 
     pyautogui.moveTo(x=460, y=652, duration=0.01)
-    right_click()
+    rightClick()
     sleep(0.05)
 
     # Right Clicked Unit Screenshot
     if (tileArray == bench_positions):
         unitScr = np.array(sct.grab(ultimate_dimensions))
-        print('corect')
+        print('correct')
     else:
         unitScr = np.array(sct.grab(monitor_dimensions))
 
@@ -326,12 +332,15 @@ def checkYordle(yor, tileArray):
     else:
         return 1
 
-def right_click():
+def rightClick():
     pyautogui.mouseDown(button='right')
     sleep(0.01)
     pyautogui.mouseUp(button='right')
-        
 
+def click():
+    pyautogui.mouseDown()
+    sleep(0.05)
+    pyautogui.mouseUp()
 
 
 
@@ -357,11 +366,6 @@ def stageOneThree():
 
     hex_positions[21][2] = checkYordle(21, hex_positions)
 
-def click():
-    pyautogui.mouseDown()
-    sleep(0.05)
-    pyautogui.mouseUp()
-
 def stageOneFour():
     # Buying a third unit
     pyautogui.moveTo(x=565, y=1000, duration=0.2)
@@ -382,11 +386,11 @@ def cycleBench():
 
         bench_positions[i][2] = currentYordle
 
-        if (Champions(currentYordle) != Champions.Nothing) and (Champions(currentYordle) != Champions.Something):
-            swapYordles(currentYordle, i)
-
-        else:
+        if(Champions(currentYordle) == Champions.Something):
             sellUnit(i)
+
+        elif (Champions(currentYordle) != Champions.Nothing):
+            swapYordles(currentYordle, i)
 
 
 def swapYordles(yordleType, benchSpot):
@@ -467,7 +471,7 @@ while True:
     stageNumber = getStageNumber()
 
     # Checking if standard, PvE, or carousel
-    type = roundType()
+    gameMode = getGameMode()
     
     print(stageNumber)
 
@@ -476,9 +480,9 @@ while True:
 
     # LEVEL & GOLD INFORMATION
 
-    gold = goldRead()
+    gold = readGold()
 
-    level = levelRead()
+    level = readLevel()
 
     if (stageNumber > 20 and type != 'carousel'):
         cycleBench()
@@ -497,24 +501,23 @@ while True:
     while (gold >= 54 and level < 6):
         level_up()
 
-        gold = goldRead()
-        level = levelRead()
+        gold = readGold()
+        level = readLevel()
     
     # Roll if 6
     while (gold >= 52 and level == 6):
         purchaseUnits() 
         roll()
-        purchaseUnits() #TODO wtf is this double buy???
 
-        gold = goldRead()
-        level = levelRead()
+        gold = readGold()
+        level = readLevel()
 
     # Skip to 8 (Janna and Veigar)
     if (gold >= 70 and level == 7):
         while (level < 8):
             level_up()
 
-            level = levelRead()
+            level = readLevel()
 
 
     while (gold >= 12 and level >= 8):
@@ -522,8 +525,8 @@ while True:
 
         roll()
 
-        gold = goldRead()
-        level = levelRead()
+        gold = readGold()
+        level = readLevel()
 
 
     if (stageNumber == 12):
