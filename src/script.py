@@ -1,5 +1,6 @@
 from contextlib import nullcontext
 from enum import Enum
+from os import write
 import cv2
 import numpy as np
 import keyboard
@@ -8,6 +9,8 @@ import pyautogui
 import pytesseract
 import re
 from time import time, sleep
+from random import seed
+from random import randint
 
 tesseract_location = open('tesseract.txt', 'r').read()
 pytesseract.pytesseract.tesseract_cmd = tesseract_location
@@ -79,10 +82,10 @@ level = 1
 
 # Shop Area
 shop_dimensions = {
-        'left': 472,
-        'top': 924,
-        'width': 1010,
-        'height': 151
+        'left': 485,
+        'top': 954,
+        'width': 830,
+        'height': 80
     }
 
 monitor_dimensions = {
@@ -111,6 +114,13 @@ stage_dimensions = {
         'top': 1,
         'width': 440,
         'height': 34
+    }
+
+ultimate_dimensions = {
+        'left': 423,
+        'top': 675,
+        'width': 1133,
+        'height': 142
     }
 
 def orbPickups():
@@ -153,11 +163,24 @@ def orbPickups():
         pyautogui.mouseUp(button='right')
         sleep(1.5)
 
+def taunt():
+    seed(1)
+
+    tauntLines = open('taunts.txt')
+    num_lines = sum(1 for _ in tauntLines)
+
+    lineChosen = randint(1, num_lines)
+
+    allLines = tauntLines.readLines()
+
+    pyautogui.press('enter')
+    pyautogui.write(allLines[lineChosen - 1])
+    pyautogui.press('enter')
+
 
 def purchaseUnits():
 
     global yordlesBought
-    sleep(0.4)
     shopScr = np.array(sct.grab(shop_dimensions))
 
     matchedYordleCards = cv2.matchTemplate(shopScr, yordle_card_image, cv2.TM_CCOEFF_NORMED)
@@ -180,7 +203,7 @@ def purchaseUnits():
 
 
     for (x, y, w, h) in yordleCards:
-        pyautogui.moveTo(x=x+472+(w/2), y=y+924+(h/2), duration=0.2)
+        pyautogui.moveTo(x=x+472+(w/2), y=y+924+(h/2))
         pyautogui.mouseDown()
         sleep(0.05)
         pyautogui.mouseUp()
@@ -269,19 +292,30 @@ def levelRead():
 
     return levelCurrent
 
-def checkYordle(yor):
+def checkYordle(yor, tileArray):
 
     # 0 = Nothing, 1 = Something, 2 = Poppy, 3 = Ziggs, 4 = Lulu, 5 = Tristana, 6 = Heimerdinger, 7 = Vex, 8 = Janna, 9 = Veigar
     # Right clicking to see character
-    pyautogui.moveTo(x=bench_positions[yor][0], y=bench_positions[yor][1], duration=0.2)
+    pyautogui.moveTo(x=tileArray[yor][0], y=tileArray[yor][1], duration=0.2)
 
     pyautogui.mouseDown(button='right')
-    sleep(0.1)
+    sleep(0.01)
     pyautogui.mouseUp(button='right')
-    sleep(0.4)
+
+    pyautogui.moveTo(x=460, y=652, duration=0.01)
+    pyautogui.mouseDown(button='right')
+    sleep(0.01)
+    pyautogui.mouseUp(button='right')
+    sleep(0.05)
 
     # Right Clicked Unit Screenshot
-    unitScr = np.array(sct.grab(monitor_dimensions))
+    if (tileArray == bench_positions):
+        unitScr = np.array(sct.grab(ultimate_dimensions))
+        print('corect')
+    else:
+        unitScr = np.array(sct.grab(monitor_dimensions))
+
+    
 
     poppySpot = cv2.matchTemplate(unitScr, poppy_ult_image, cv2.TM_CCOEFF_NORMED).max()
     ziggsSpot = cv2.matchTemplate(unitScr, ziggs_ult_image, cv2.TM_CCOEFF_NORMED).max()
@@ -296,7 +330,7 @@ def checkYordle(yor):
     if maxYordleMatch > 0.95:
         return yorVals.index(maxYordleMatch) + 2
     else:
-        return 0
+        return 1
         
 
 
@@ -309,7 +343,7 @@ def stageOneTwo():
     pyautogui.moveTo(x=hex_positions[2][0], y=hex_positions[2][1], duration=0.2)
     pyautogui.mouseUp()
 
-    hex_positions[2][2] = checkYordle(2)
+    hex_positions[2][2] = checkYordle(2, hex_positions)
 
 def stageOneThree():
     # Buying a second unit
@@ -321,7 +355,99 @@ def stageOneThree():
     # Moving on a unit
     pyautogui.moveTo(x=bench_positions[0][0], y=bench_positions[0][1], duration=0.2)
     pyautogui.mouseDown()
-    pyautogui.moveTo(x=hex_positions[2][0], y=hex_positions[2][1], duration=0.2)
+    pyautogui.moveTo(x=hex_positions[21][0], y=hex_positions[21][1], duration=0.2)
+    pyautogui.mouseUp()
+
+    hex_positions[21][2] = checkYordle(21, hex_positions)
+
+def stageOneFour():
+    # Buying a third unit
+    pyautogui.moveTo(x=565, y=1000, duration=0.2)
+    pyautogui.mouseDown()
+    sleep(0.05)
+    pyautogui.mouseUp()
+
+    # Moving on a unit
+    pyautogui.moveTo(x=bench_positions[0][0], y=bench_positions[0][1], duration=0.2)
+    pyautogui.mouseDown()
+    pyautogui.moveTo(x=hex_positions[26][0], y=hex_positions[26][1], duration=0.2)
+    pyautogui.mouseUp()
+
+    hex_positions[26][2] = checkYordle(26, hex_positions) # TODO set something back here, if it swaps w another yordle
+
+def cycleBench():
+
+    for i in range(9):
+        currentYordle = checkYordle(i, bench_positions)
+
+        bench_positions[i][2] = currentYordle
+
+        if currentYordle > 1:
+            swapYordles(currentYordle, i)
+
+        else:
+            sellUnit(i)
+
+
+def swapYordles(yordleType, benchSpot):
+    if yordleType == 2:
+        if hex_positions[2][2] != 2:
+            pyautogui.moveTo(x=bench_positions[benchSpot][0], y=bench_positions[benchSpot][1], duration=0.2)
+            pyautogui.mouseDown()
+            pyautogui.moveTo(x=hex_positions[2][0], y=hex_positions[2][1], duration=0.2)
+            pyautogui.mouseUp()
+
+            hex_positions[2][2] = 2
+    
+    elif yordleType == 3:
+        if hex_positions[21][2] != 3:
+            pyautogui.moveTo(x=bench_positions[benchSpot][0], y=bench_positions[benchSpot][1], duration=0.2)
+            pyautogui.mouseDown()
+            pyautogui.moveTo(x=hex_positions[21][0], y=hex_positions[21][1], duration=0.2)
+            pyautogui.mouseUp()
+
+            hex_positions[21][2] = 3
+
+    elif yordleType == 4:
+        if hex_positions[27][2] != 4:
+            pyautogui.moveTo(x=bench_positions[benchSpot][0], y=bench_positions[benchSpot][1], duration=0.2)
+            pyautogui.mouseDown()
+            pyautogui.moveTo(x=hex_positions[27][0], y=hex_positions[27][1], duration=0.2)
+            pyautogui.mouseUp()
+
+            hex_positions[27][2] = 4
+
+    elif yordleType == 5:
+        if hex_positions[26][2] != 5:
+            pyautogui.moveTo(x=bench_positions[benchSpot][0], y=bench_positions[benchSpot][1], duration=0.2)
+            pyautogui.mouseDown()
+            pyautogui.moveTo(x=hex_positions[26][0], y=hex_positions[26][1], duration=0.2)
+            pyautogui.mouseUp()
+
+            hex_positions[26][2] = 5
+
+    elif yordleType == 6:
+        if hex_positions[22][2] != 6:
+            pyautogui.moveTo(x=bench_positions[benchSpot][0], y=bench_positions[benchSpot][1], duration=0.2)
+            pyautogui.mouseDown()
+            pyautogui.moveTo(x=hex_positions[22][0], y=hex_positions[22][1], duration=0.2)
+            pyautogui.mouseUp()
+
+            hex_positions[22][2] = 6
+
+    elif yordleType == 7:
+        if hex_positions[4][2] != 7:
+            pyautogui.moveTo(x=bench_positions[benchSpot][0], y=bench_positions[benchSpot][1], duration=0.2)
+            pyautogui.mouseDown()
+            pyautogui.moveTo(x=hex_positions[4][0], y=hex_positions[4][1], duration=0.2)
+            pyautogui.mouseUp()
+
+            hex_positions[4][2] = 7
+
+def sellUnit(benchSpot):
+    pyautogui.moveTo(x=bench_positions[benchSpot][0], y=bench_positions[benchSpot][1])
+    pyautogui.mouseDown()
+    pyautogui.moveTo(x=565, y=1000)
     pyautogui.mouseUp()
 
 # Game Loop
@@ -352,6 +478,9 @@ while True:
 
     level = levelRead()
 
+    if (stageNumber > 20 and type != 'carousel'):
+        cycleBench()
+
     print(level)
     print(gold)
     print(type)
@@ -366,13 +495,12 @@ while True:
     while (gold >= 54 and level < 6):
         level_up()
 
-        purchaseUnits()
-
         gold = goldRead()
         level = levelRead()
     
     # Roll if 6
     while (gold >= 52 and level == 6):
+        purchaseUnits()
 
         pyautogui.moveTo(x=360, y=1040, duration=0.2)
         pyautogui.mouseDown()
@@ -393,15 +521,18 @@ while True:
 
 
     while (gold >= 12 and level >= 8):
-        pyautogui.moveTo(x=360, y=1040, duration=0.2)
+        purchaseUnits()
+
+        pyautogui.moveTo(x=360, y=1040)
         pyautogui.mouseDown()
         sleep(0.05)
         pyautogui.mouseUp()
 
-        purchaseUnits()
-
         gold = goldRead()
         level = levelRead()
+
+        print(gold)
+        print(level)
 
     if (stageNumber == 12):
         stageOneTwo()
@@ -409,6 +540,10 @@ while True:
     if (stageNumber == 13):
         stageOneThree()
 
+    if (stageNumber == 14):
+        stageOneFour()
+
+    # taunt()
 
     while stageNumber == getStageNumber():
         if (type == 'pve' or type == 'postpve'):
