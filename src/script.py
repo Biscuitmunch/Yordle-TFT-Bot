@@ -8,8 +8,7 @@ import pyautogui
 import pytesseract
 import re
 from time import time, sleep
-from random import seed
-from random import randint
+import random
 
 tesseract_location = open('tesseract.txt', 'r').read()
 pytesseract.pytesseract.tesseract_cmd = tesseract_location
@@ -152,17 +151,12 @@ def orbPickups():
         sleep(1.5)
 
 def taunt():
-    seed(1)
 
-    tauntLines = open('taunts.txt')
-    num_lines = sum(1 for _ in tauntLines)
-
-    lineChosen = randint(1, num_lines)
-
-    allLines = tauntLines.readLines()
+    tauntLines = open('taunts.txt').read().splitlines()
+    tauntLineChosen = random.choice(tauntLines)
 
     pyautogui.press('enter')
-    pyautogui.write(allLines[lineChosen - 1])
+    pyautogui.write(tauntLineChosen)
     pyautogui.press('enter')
 
 
@@ -534,7 +528,7 @@ while True:
     if (stageNumber == 14):
         stageOneFour()
 
-    # taunt()
+    taunt()
 
     while stageNumber == getStageNumber():
         if (type == 'pve' or type == 'postpve'):
