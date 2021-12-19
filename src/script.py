@@ -87,6 +87,8 @@ gameMode = 'null'
 gold = 0
 level = 1
 
+augmentsPicked = [False,False,False]
+
 # Shop Area
 shop_dimensions = {
         'left': 485,
@@ -249,7 +251,7 @@ def getStageNumber():
 def getGameMode():
 
     if (stageNumber == 14) or (stageNumber == 33) or (stageNumber == 46):
-        if(checkForAugmentCards()):
+        if(checkIfAugmentSelected()==False):
             return 'augment'
 
     # PvE Stage. Checking for Stage '1 - x', 'x - 1', or 'x - 7'
@@ -301,8 +303,21 @@ def readLevel():
     return levelCurrent
 
 #returns if augment cards are on screen
-def checkForAugmentCards(): #TODO implement image comparison
-    return False 
+def checkIfAugmentSelected():
+    if(stageNumber==14):
+        if(augmentsPicked[0]==False):
+            augmentsPicked[0]==True
+            return False
+    elif(stageNumber==33):
+        if(augmentsPicked[1]==False):
+            augmentsPicked[1]==True
+            return False
+    elif(stageNumber==46):
+        if(augmentsPicked[2]==False):
+            augmentsPicked[2]==True
+            return False
+
+    return True
 
 #returns the names of the 3 displayed augments on the screen
 def readAugments(): #TODO implement augment text reading
