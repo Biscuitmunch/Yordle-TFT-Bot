@@ -451,11 +451,11 @@ def sellUnit(benchSpot):
     pyautogui.mouseUp()
 
 def level_up():
-    pyautogui.moveTo(x=360, y=960, duration=0.2)
+    pyautogui.moveTo(x=360, y=960)
     click()
 
 def roll():
-    pyautogui.moveTo(x=360, y=1040, duration=0.2)
+    pyautogui.moveTo(x=360, y=1040)
     click()
 
 # Game Loop
