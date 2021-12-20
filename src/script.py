@@ -45,6 +45,13 @@ tristana_ult_image = cv2.imread('ultIcons\\tristanaUlt.png', cv2.IMREAD_UNCHANGE
 heimer_ult_image = cv2.imread('ultIcons\\heimerUlt.png', cv2.IMREAD_UNCHANGED)
 vex_ult_image = cv2.imread('ultIcons\\vexUlt.png', cv2.IMREAD_UNCHANGED)
 
+#import tierList
+tierListFile = open("augmentTierList.txt", "r")
+augmentTierList = tierListFile.readlines()
+#remove the newline character at the end of each augment name
+for i in range(len(augmentTierList)) : 
+    augmentTierList[i] = augmentTierList[i][:-1]
+
 class Champions(Enum) :
     Nothing=0
     Something=1
@@ -74,10 +81,12 @@ yordlesBought = 0
 
 singleExpBuy = 0
 
-type = 'null'
+gameMode = 'null'
 
 gold = 0
 level = 1
+
+augmentsPicked = [False,False,False]
 
 # Shop Area
 shop_dimensions = {
@@ -157,7 +166,7 @@ def orbPickups():
 
     for (x, y, w, h) in orbLocations:
         pyautogui.moveTo(x=x, y=y, duration=0.2)
-        right_click()
+        rightClick()
         sleep(1.5)
 
 def taunt():
@@ -233,21 +242,24 @@ def getStageNumber():
 
     return stageValue * 10 + dashValue
 
-def roundType():
+def getGameMode():
+
+    if (stageNumber == 14) or (stageNumber == 33) or (stageNumber == 46):
+        if(checkIfAugmentSelected()==False):
+            return 'augment'
+
     # PvE Stage. Checking for Stage '1 - x', 'x - 1', or 'x - 7'
 
-    if stageNumber == 11 or (stageNumber - 4) % 10 == 0:
-        type = 'carousel'
+    if stageNumber == 11 or (stageNumber - 4) % 10 == 0: #BUG fix this
+        return 'carousel'
     elif stageNumber < 20 or (stageNumber - 7) % 10 == 0:
-        type = 'pve'
+        return 'pve'
     elif (stageNumber - 1) % 10 == 0:
-        type = 'postpve'
+        return 'postpve'
     else:
-        type = 'standard'
+        return 'standard'
 
-    return type
-
-def goldRead():
+def readGold():
 
     sleep(0.4)
     goldScr = np.array(sct.grab(gold_dimensions))
@@ -265,7 +277,7 @@ def goldRead():
 
     return goldCurrent
 
-def levelRead():
+def readLevel():
 
     sleep(0.4)
     # Changing to RGB
@@ -284,22 +296,73 @@ def levelRead():
 
     return levelCurrent
 
+#returns if augment cards are on screen
+def checkIfAugmentSelected():
+    if(stageNumber==14):
+        if(augmentsPicked[0]==False):
+            augmentsPicked[0]==True
+            return False
+    elif(stageNumber==33):
+        if(augmentsPicked[1]==False):
+            augmentsPicked[1]==True
+            return False
+    elif(stageNumber==46):
+        if(augmentsPicked[2]==False):
+            augmentsPicked[2]==True
+            return False
+
+    return True
+
+#returns the names of the 3 displayed augments on the screen
+def readAugments(): #TODO implement augment text reading
+    return ['null','null','null']
+
+#selects which augment to pick
+def selectAugment():
+
+    augments = readAugments()
+    augmentRanks = [255,255,255]
+
+    for i in range(3):
+        augmentRanks[i] = getAugmentTier(augments[i])
+
+    augmentToPick = 0
+    if (augmentRanks[0]>augmentRanks[1]):
+        augmentToPick = 1
+    if (augmentRanks[augmentToPick]>augmentRanks[2]):
+        augmentToPick = 2
+
+    augmentXLocation = 590+augmentToPick*360
+    pyautogui.moveTo(x=augmentXLocation, y=530)
+    click()
+    sleep(1) #wait for augment selection animation to resolve
+
+#find and return the position of the augment in the tierlist, if not match is found then return 255 and print an error message
+def getAugmentTier(currentAugment):
+
+    for i in range(len(augmentTierList)):
+        if augmentTierList[i] == currentAugment:
+            return i
+
+    print("Augment Not Recognised") #TODO log a screenshot of the augment and what it was read as to know what went wrong
+    return 255
+
 def checkYordle(yor, tileArray):
 
     # 0 = Nothing, 1 = Something, 2 = Poppy, 3 = Ziggs, 4 = Lulu, 5 = Tristana, 6 = Heimerdinger, 7 = Vex, 8 = Janna, 9 = Veigar
     # Right clicking to see character
     pyautogui.moveTo(x=tileArray[yor][0], y=tileArray[yor][1], duration=0.2)
 
-    right_click()
+    rightClick()
 
     pyautogui.moveTo(x=460, y=652, duration=0.01)
-    right_click()
+    rightClick()
     sleep(0.05)
 
     # Right Clicked Unit Screenshot
     if (tileArray == bench_positions):
         unitScr = np.array(sct.grab(ultimate_dimensions))
-        print('corect')
+        print('correct')
     else:
         unitScr = np.array(sct.grab(monitor_dimensions))
 
@@ -320,12 +383,15 @@ def checkYordle(yor, tileArray):
     else:
         return 1
 
-def right_click():
+def rightClick():
     pyautogui.mouseDown(button='right')
     sleep(0.01)
     pyautogui.mouseUp(button='right')
-        
 
+def click():
+    pyautogui.mouseDown()
+    sleep(0.05)
+    pyautogui.mouseUp()
 
 
 
@@ -351,11 +417,6 @@ def stageOneThree():
 
     hex_positions[21][2] = checkYordle(21, hex_positions)
 
-def click():
-    pyautogui.mouseDown()
-    sleep(0.05)
-    pyautogui.mouseUp()
-
 def stageOneFour():
     # Buying a third unit
     pyautogui.moveTo(x=565, y=1000, duration=0.2)
@@ -376,11 +437,11 @@ def cycleBench():
 
         bench_positions[i][2] = currentYordle
 
-        if (Champions(currentYordle) != Champions.Nothing) and (Champions(currentYordle) != Champions.Something):
-            swapYordles(currentYordle, i)
-
-        else:
+        if(Champions(currentYordle) == Champions.Something):
             sellUnit(i)
+
+        elif (Champions(currentYordle) != Champions.Nothing):
+            swapYordles(currentYordle, i)
 
 
 def swapYordles(yordleType, benchSpot):
@@ -461,7 +522,7 @@ while True:
     stageNumber = getStageNumber()
 
     # Checking if standard, PvE, or carousel
-    type = roundType()
+    gameMode = getGameMode()
     
     print(stageNumber)
 
@@ -470,16 +531,20 @@ while True:
 
     # LEVEL & GOLD INFORMATION
 
-    gold = goldRead()
+    gold = readGold()
 
-    level = levelRead()
+    level = readLevel()
 
-    if (stageNumber > 20 and type != 'carousel'):
+    if (gameMode == 'augment') :
+        selectAugment()
+        continue
+
+    if (stageNumber > 20 and gameMode != 'carousel'):
         cycleBench()
 
     print(level)
     print(gold)
-    print(type)
+    print(gameMode)
 
     if singleExpBuy == 0 and gold > 14:
         level_up()
@@ -491,24 +556,23 @@ while True:
     while (gold >= 54 and level < 6):
         level_up()
 
-        gold = goldRead()
-        level = levelRead()
+        gold = readGold()
+        level = readLevel()
     
     # Roll if 6
     while (gold >= 52 and level == 6):
         purchaseUnits() 
         roll()
-        purchaseUnits() #TODO wtf is this double buy???
 
-        gold = goldRead()
-        level = levelRead()
+        gold = readGold()
+        level = readLevel()
 
     # Skip to 8 (Janna and Veigar)
     if (gold >= 70 and level == 7):
         while (level < 8):
             level_up()
 
-            level = levelRead()
+            level = readLevel()
 
 
     while (gold >= 12 and level >= 8):
@@ -516,8 +580,8 @@ while True:
 
         roll()
 
-        gold = goldRead()
-        level = levelRead()
+        gold = readGold()
+        level = readLevel()
 
 
     if (stageNumber == 12):
@@ -532,7 +596,7 @@ while True:
     taunt()
 
     while stageNumber == getStageNumber():
-        if (type == 'pve' or type == 'postpve'):
+        if (gameMode == 'pve' or gameMode == 'postpve'):
             orbPickups()
 
         purchaseUnits()
